@@ -15,36 +15,74 @@ El propósito de este repositorio es doble:
 
 ---
 
-## 🚀 Requisitos e Instalación
 
-Para explorar los ejemplos o ejecutar el código de este repositorio, necesitarás un entorno específico que combine hardware y software.
 
-### Requisitos Previos de Hardware y Software
+## 🐛 El Desafío: Conflictos de Entorno (PyTorch vs. Numba)
 
-1.  **GPU NVIDIA:** Es indispensable contar con una tarjeta gráfica NVIDIA compatible con CUDA.
-2.  **NVIDIA CUDA Toolkit:** Este proyecto *depende* del NVIDIA CUDA Toolkit. Deberás descargarlo e instalarlo por separado desde el [sitio oficial de NVIDIA Developer](https://developer.nvidia.com/cuda-toolkit).
-    * La instalación y uso del CUDA Toolkit están sujetos al Acuerdo de Licencia de Usuario Final (EULA) de NVIDIA.
-3.  **Python:** Se recomienda Python 3.8 o superior.
+Durante el desarrollo inicial, **descubrí un conflicto de dependencias fundamental** al intentar instalar `numba` (que requiere un `cudatoolkit` específico de `conda-forge`) junto con `pytorch` (que impone su propio paquete `pytorch-cuda` y bibliotecas asociadas).
 
-### Configuración del Entorno
+Conda no pudo resolver una configuración compatible que satisficiera ambos paquetes simultáneamente en el mismo entorno. Esto llevó a errores persistentes como `LibMambaUnsatisfiableError` o `FileNotFoundError: nvvm.dll`.
 
-1.  **Jupyter Notebook:** Los análisis y ejemplos de este proyecto están presentados en formato de Jupyter Notebooks (`.ipynb`). Es la herramienta que he elegido para ejecutar y visualizar el código interactivamente.
-    * Puedes instalar Jupyter Notebook usando:
-      ```bash
-      pip install jupyterlab
-      ```
-2.  **Bibliotecas de Python:** El código utiliza Numba para la compilación JIT (Just-in-Time) de CUDA Python, junto con otras bibliotecas estándar.
-    * Instala las bibliotecas necesarias:
-      ```bash
-      pip install numba numpy pandas
-      ```
-3.  **Ejecución:**
-    * Clona este repositorio.
-    * Navega a la carpeta del proyecto y ejecuta:
-      ```bash
-      jupyter-lab
-      ```
-    * Esto abrirá JupyterLab en tu navegador, permitiéndote abrir y ejecutar los notebooks.
+**💡 La Solución Adoptada:** La estrategia más robusta y que recomiendo es mantener **entornos Conda separados**:
+
+1.  Un entorno dedicado exclusivamente a **Numba y código CUDA** (el descrito en este `README`, necesario para ejecutar este proyecto).
+2.  Otro entorno separado para **PyTorch** (para proyectos futuros de Machine Learning).
+
+---
+## 🚀 Configuración del Entorno (Numba CUDA para Este Proyecto)
+
+Para ejecutar el código de este repositorio (`Montecarlo_cuda.ipynb`), es **esencial** crear y configurar un entorno Conda específico para Numba de la siguiente manera:
+
+### Requisitos Previos
+
+1.  **GPU NVIDIA:** Indispensable contar con una tarjeta gráfica NVIDIA compatible con CUDA.
+2.  **NVIDIA CUDA Toolkit (Instalación del Sistema):** Aunque Conda instalará sus propias bibliotecas, recomiendo tener el CUDA Toolkit oficial instalado en el sistema (descargado desde [NVIDIA Developer](https://developer.nvidia.com/cuda-toolkit)). Esto asegura que los *drivers* de la GPU estén actualizados. La instalación de Conda manejará las bibliotecas necesarias para Numba.
+3.  **Miniconda/Anaconda:** Necesitas una instalación de Conda.
+
+### Pasos de Configuración
+
+4. Crear el Entorno Conda (`env_numba`):
+
+Abre tu terminal (Anaconda Prompt) y ejecuta este comando. Usamos `conda-forge` como canal prioritario para asegurar la compatibilidad:  
+
+conda create -n env_numba -c conda-forge python=3.10 numba cudatoolkit jupyterlab ipykernel numpy
+
+- `-n env_numba`: Nombre del entorno.
+- `-c conda-forge`: Prioriza este canal. Es crucial para la compatibilidad Numba/cudatoolkit.
+- `python=3.10`: Versión de Python (ajusta si es necesario).
+- `numba cudatoolkit`: Instala Numba y las bibliotecas CUDA correspondientes.
+- `jupyterlab ipykernel numpy`: Herramientas para ejecutar el notebook.
+
+5. Activar el Entorno:
+
+Cada vez que trabajes en este proyecto, activa el entorno:
+
+conda activate env_numba
+
+(Tu terminal debería mostrar `(env_numba)` al inicio).
+
+ 6. Conectar el Entorno a Jupyter
+
+Para que Jupyter Notebook/Lab reconozca este entorno, regístralo como un "Kernel":
+python -m ipykernel install --user --name="env_numba" --display-name="Python (Numba Only)"
+
+ `--display-name="Python (Numba Only)"`: Este es el nombre que verás en Jupyter.
+
+---
+## ▶️ Cómo Ejecutar el Notebook
+
+1. Clona este repositorio a tu máquina local.
+2. Abre tu terminal (Anaconda Prompt).
+3. Crea el entorno (`env_numba`)
+4. Activa el entorno Conda: `conda activate env_numba`.
+6. Navega a la carpeta donde clonaste el repositorio.
+7. Inicia JupyterLab: `jupyter-lab`.
+8. Abre el notebook `Montecarlo_cuda.ipynb`.
+9. **¡Verifica y Selecciona el Kernel Correcto!** Dentro de Jupyter, ve al menú **Kernel > Change Kernel...** y asegúrate de seleccionar **"Python (Numba Only)"**. Si está seleccionado otro, cámbialo.
+10. Ejecuta las celdas del notebook en orden.
+
+
+
 
 ---
 
@@ -99,6 +137,6 @@ En resumen, la CPU es el director de orquesta que maneja la lógica compleja y s
 
 ## 📜 Licencia
 
-El código fuente de este proyecto (los archivos `.py` y `.ipynb`) se distribuye bajo la **Licencia MIT**.
+El código fuente de este proyecto ( `.ipynb`) se distribuye bajo la **Licencia MIT**.
 
 El software de terceros del que depende (como el NVIDIA CUDA Toolkit) mantiene sus propias licencias y acuerdos (EULA).
