@@ -4,7 +4,7 @@ Este documento resume mis notas y conclusiones sobre las diferencias arquitectó
 
 ---
 
-## 🎯 Objetivos del Proyecto
+## 🎯 Objetivos del Proyecto 
 
 El propósito de este repositorio es doble:
 
